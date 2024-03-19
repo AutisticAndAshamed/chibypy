@@ -1,4 +1,4 @@
-# Chungus-Aerospace
+# ChiByPy
 
 Python module based around chi squared statistics for data fitting in experimental physics
 
