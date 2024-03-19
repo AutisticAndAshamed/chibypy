@@ -14,14 +14,13 @@
 """
 
 
-def chiplot(xdata, ydata, sigma, fitfunction, vars, freevarrange, freevarint): 
+def chiplot(xdata, ydata, fitfunction, vars, freevarrange, freevarint, sigma): 
     
     vars = list(vars)
-    fit = numpy.zeros(len(freevarrange))
     chivalue = numpy.zeros(len(freevarrange))
     
 
-    for i in enumerate(freevarrange):
+    for i, point in enumerate(freevarrange):
         
         vars[freevarint] = freevarrange[i]
         fit = fitfunction(xdata, *vars)
@@ -33,6 +32,20 @@ def chiplot(xdata, ydata, sigma, fitfunction, vars, freevarrange, freevarint):
 
     uncertainty_indices = numpy.argsort(numpy.abs(chivalue - (chimin + 1)))[:2]
     uncertainty = numpy.sort(freevarrange[uncertainty_indices] - variablevalue)
+    
+    return chivalue, chimin, variablevalue, uncertainty
 
-    return chivalue, variablevalue, uncertainty
+def errorflatten(datax, datay, sigmax, sigmay):
+    def linearfit(x, m, b):
+        return m * x + b
 
+    yerror = sigmay
+    for i in range(10000):
+        popt, pcov = scipy.optimize.curve_fit(linearfit, datax, datay, sigma = yerror)
+
+        m = popt[0]
+        yerrorstar = m * sigmax
+        yerror = numpy.sqrt(sigmay**2 + yerrorstar**2)
+
+
+    return yerror
