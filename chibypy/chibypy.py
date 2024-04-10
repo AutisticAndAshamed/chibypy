@@ -12,12 +12,12 @@
      * http://www.wtfpl.net/ for more details.
 
 """
-
+import numpy as np
+from scipy.optimize import curve_fit
 
 def chiplot(xdata, ydata, fitfunction, vars, freevarrange, freevarint, sigma): 
-    
     vars = list(vars)
-    chivalue = numpy.zeros(len(freevarrange))
+    chivalue = np.zeros(len(freevarrange))
     
 
     for i, point in enumerate(freevarrange):
@@ -25,13 +25,13 @@ def chiplot(xdata, ydata, fitfunction, vars, freevarrange, freevarint, sigma):
         vars[freevarint] = freevarrange[i]
         fit = fitfunction(xdata, *vars)
         dev = ((ydata - fit)**2) / sigma ** 2
-        chivalue[i] = numpy.sum(dev)
+        chivalue[i] = np.sum(dev)
 
-    chimin = numpy.min(chivalue)
-    variablevalue = freevarrange[numpy.where(chivalue == float(chimin))]
+    chimin = np.min(chivalue)
+    variablevalue = freevarrange[np.where(chivalue == float(chimin))]
 
-    uncertainty_indices = numpy.argsort(numpy.abs(chivalue - (chimin + 1)))[:2]
-    uncertainty = numpy.sort(freevarrange[uncertainty_indices] - variablevalue)
+    uncertainty_indices = np.argsort(np.abs(chivalue - (chimin + 1)))[:2]
+    uncertainty = np.sort(freevarrange[uncertainty_indices] - variablevalue)
     
     return chivalue, chimin, variablevalue, uncertainty
 
@@ -41,11 +41,11 @@ def errorflatten(datax, datay, sigmax, sigmay):
 
     yerror = sigmay
     for i in range(10000):
-        popt, pcov = scipy.optimize.curve_fit(linearfit, datax, datay, sigma = yerror)
+        popt, pcov = curve_fit(linearfit, datax, datay, sigma = yerror)
 
         m = popt[0]
         yerrorstar = m * sigmax
-        yerror = numpy.sqrt(sigmay**2 + yerrorstar**2)
+        yerror = np.sqrt(sigmay**2 + yerrorstar**2)
 
 
     return yerror
